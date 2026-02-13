@@ -6,28 +6,45 @@
   <title>Krea Enterprise Pricing Calculator</title>
   <link rel="icon" href="https://www.krea.ai/favicon.ico">
   <style>
-    /* Suisse Text font – replace paths with actual font files */
     @font-face {
-      font-family: 'Suisse Text';
-      src: url('./fonts/SuisseText-Regular.woff2') format('woff2'),
-           url('./fonts/SuisseText-Regular.woff') format('woff');
+      font-family: 'Suisse Intl';
+      src: url('../SuisseIntl-Light.otf') format('opentype');
+      font-weight: 300;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'Suisse Intl';
+      src: url('../SuisseIntl-Regular.otf') format('opentype');
       font-weight: 400;
       font-style: normal;
       font-display: swap;
     }
     @font-face {
-      font-family: 'Suisse Text';
-      src: url('./fonts/SuisseText-Medium.woff2') format('woff2'),
-           url('./fonts/SuisseText-Medium.woff') format('woff');
+      font-family: 'Suisse Intl';
+      src: url('../SuisseIntl-Book.otf') format('opentype');
+      font-weight: 450;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'Suisse Intl';
+      src: url('../SuisseIntl-Medium.otf') format('opentype');
       font-weight: 500;
       font-style: normal;
       font-display: swap;
     }
     @font-face {
-      font-family: 'Suisse Text';
-      src: url('./fonts/SuisseText-Light.woff2') format('woff2'),
-           url('./fonts/SuisseText-Light.woff') format('woff');
-      font-weight: 300;
+      font-family: 'Suisse Intl';
+      src: url('../SuisseIntl-SemiBold.otf') format('opentype');
+      font-weight: 600;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'Suisse Intl';
+      src: url('../SuisseIntl-Bold.otf') format('opentype');
+      font-weight: 700;
       font-style: normal;
       font-display: swap;
     }
@@ -40,7 +57,7 @@
     body {
       min-height: 100vh;
       background: #fff;
-      font-family: 'Suisse Text', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: 'Suisse Intl', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       color: #000;
       padding: 60px 24px;
     }
@@ -234,7 +251,7 @@
       border-radius: 8px;
       font-size: 15px;
       font-weight: 500;
-      font-family: 'Suisse Text', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: 'Suisse Intl', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       cursor: pointer;
       display: flex;
       align-items: center;
