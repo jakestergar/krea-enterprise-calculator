@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Krea Enterprise Pricing Calculator</title>
+  <link rel="icon" href="https://www.krea.ai/favicon.ico">
+  <style>
+    /* Suisse Text font – replace paths with actual font files */
+    @font-face {
+      font-family: 'Suisse Text';
+      src: url('./fonts/SuisseText-Regular.woff2') format('woff2'),
+           url('./fonts/SuisseText-Regular.woff') format('woff');
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'Suisse Text';
+      src: url('./fonts/SuisseText-Medium.woff2') format('woff2'),
+           url('./fonts/SuisseText-Medium.woff') format('woff');
+      font-weight: 500;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'Suisse Text';
+      src: url('./fonts/SuisseText-Light.woff2') format('woff2'),
+           url('./fonts/SuisseText-Light.woff') format('woff');
+      font-weight: 300;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      min-height: 100vh;
+      background: #fff;
+      font-family: 'Suisse Text', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: #000;
+      padding: 60px 24px;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: 48px;
+      font-weight: 400;
+      text-align: center;
+      margin-bottom: 12px;
+      letter-spacing: -1px;
+    }
+    .subtitle {
+      font-size: 16px;
+      color: #666;
+      text-align: center;
+      margin-bottom: 48px;
+    }
+    .card {
+      background: #fafafa;
+      border: 1px solid #e0e0e0;
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 24px;
+    }
+    .label {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 4px;
+    }
+    .sublabel {
+      font-size: 13px;
+      color: #999;
+    }
+    .tier-grid {
+      display: flex;
+      gap: 16px;
+    }
+    .tier-card {
+      flex: 1;
+      padding: 20px;
+      background: transparent;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tier-card.active {
+      background: #f0f0f0;
+      border: 2px solid #000;
+    }
+    .tier-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 12px;
+    }
+    .tier-name {
+      font-size: 16px;
+      font-weight: 500;
+    }
+    .tier-price {
+      font-size: 24px;
+      font-weight: 500;
+    }
+    .tier-price span {
+      font-size: 14px;
+      color: #666;
+    }
+    .tier-features {
+      font-size: 12px;
+      color: #888;
+      line-height: 1.6;
+    }
+    .tier-compute {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid #e0e0e0;
+      font-size: 12px;
+      color: #444;
+      font-weight: 500;
+    }
+    .slider-section {
+      margin-bottom: 32px;
+    }
+    .slider-section.bordered {
+      padding-top: 24px;
+      border-top: 1px solid #e0e0e0;
+    }
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 16px;
+    }
+    .slider-value {
+      font-size: 32px;
+      font-weight: 500;
+    }
+    .slider-value span {
+      font-size: 16px;
+      color: #666;
+    }
+    .slider-ticks {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #999;
+      margin-bottom: 8px;
+    }
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 4px;
+      background: #ccc;
+      border-radius: 2px;
+      outline: none;
+      cursor: pointer;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      background: #000;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      background: #000;
+      border-radius: 50%;
+      cursor: pointer;
+      border: none;
+    }
+    .slider-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 12px;
+      font-size: 14px;
+    }
+    .savings {
+      font-size: 12px;
+      color: #16a34a;
+    }
+    .volume-active {
+      color: #16a34a;
+      margin-left: 8px;
+    }
+    .summary-items {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 15px;
+    }
+    .summary-row span:first-child {
+      color: #666;
+    }
+    .total-section {
+      border-top: 1px solid #e0e0e0;
+      padding-top: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+    .total-value {
+      font-size: 42px;
+      font-weight: 500;
+    }
+    .total-savings {
+      font-size: 14px;
+      color: #16a34a;
+      margin-top: 4px;
+    }
+    .cta-button {
+      width: 100%;
+      margin-top: 24px;
+      padding: 16px;
+      background: #000;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 500;
+      font-family: 'Suisse Text', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .cta-button:hover {
+      background: #222;
+    }
+    .term-option {
+      flex: 1;
+      padding: 16px;
+      background: transparent;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+    .term-option:hover {
+      border-color: #999;
+    }
+    .term-option.active {
+      background: #f0f0f0;
+      border: 2px solid #000;
+    }
+    .term-years {
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+    .term-discount {
+      font-size: 12px;
+      color: #666;
+    }
+    .term-option.active .term-discount {
+      color: #16a34a;
+    }
+    .features-grid {
+      margin-top: 32px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .feature-card {
+      background: #fafafa;
+      border: 1px solid #e0e0e0;
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .feature-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .feature-title {
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .feature-desc {
+      font-size: 13px;
+      color: #888;
+    }
+    .footer {
+      margin-top: 48px;
+      text-align: center;
+      font-size: 13px;
+      color: #999;
+    }
+    @media (max-width: 768px) {
+      h1 { font-size: 32px; }
+      .tier-grid { flex-direction: column; }
+      .features-grid { grid-template-columns: 1fr; }
+      .total-section { flex-direction: column; gap: 16px; }
+      .slider-header { flex-direction: column; gap: 8px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Krea Logo -->
+    <a href="https://krea.ai" target="_blank" style="position: absolute; top: 40px; left: 40px;">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="#000" xmlns="http://www.w3.org/2000/svg">
+        <path d="M8.34 1.266c1.766-.124 3.324 1.105 3.551 2.802.216 1.612-.887 3.171-2.545 3.536-.415.092-.877.066-1.317.122a4.63 4.63 0 0 0-2.748 1.34l-.008.004-.01-.001-.006-.005-.003-.009q0-.009.005-.016a.04.04 0 0 0 .007-.022 438 438 0 0 1-.01-4.541c.003-1.68 1.33-3.086 3.085-3.21"/>
+        <path d="M8.526 15.305c-2.247-.018-3.858-2.23-3.076-4.3a3.31 3.31 0 0 1 2.757-2.11c.384-.04.845-.03 1.215-.098 1.9-.353 3.368-1.806 3.665-3.657.066-.41.031-.9.128-1.335.449-2.016 2.759-3.147 4.699-2.236 1.011.476 1.69 1.374 1.857 2.447q.051.33.034.818c-.22 5.842-5.21 10.519-11.279 10.47"/>
+        <path d="M11.357 16.235q3.458-.792 5.992-3.185c.27.357.554.74.78 1.106a10.6 10.6 0 0 1 1.585 4.89q.037.53.023.819c-.084 1.705-1.51 3.08-3.31 3.09-1.592.01-2.992-1.077-3.294-2.597-.072-.36-.05-.858-.11-1.238q-.282-1.755-1.715-2.84z"/>
+        <path d="M7.988 21.945c-1.353-.235-2.441-1.286-2.684-2.593a5 5 0 0 1-.05-.817V15.14c.884.786 1.814 1.266 3.028 1.346l.326.01c1.581.051 2.92 1.198 3.182 2.72.115.672.043 1.573.258 2.24.344 1.068 1.233 1.945 2.322 2.27l.006.002.003.005-.001.007-.006.005-.007.001c-2.247.317-4.51-.133-6.377-1.8"/>
+      </svg>
+    </a>
+
+    <h1>Enterprise Pricing</h1>
+    <p class="subtitle">Calculate your investment for Krea Enterprise</p>
+
+    <!-- Platform Tier -->
+    <div class="card">
+      <div class="label" style="margin-bottom: 16px;">Platform Tier</div>
+      <div class="tier-grid">
+        <div class="tier-card active" id="tier1-card" onclick="selectTier('tier1')">
+          <div class="tier-header">
+            <span class="tier-name">Tier 1</span>
+            <span class="tier-price">$25,000<span>/yr</span></span>
+          </div>
+          <div class="tier-features">
+            • Security docs shared<br>
+            • Direct invoicing<br>
+            • Onboarding & priority support<br>
+            • Standard MSA
+          </div>
+          <div class="tier-compute">825,000 compute units / month included</div>
+        </div>
+        <div class="tier-card" id="tier2-card" onclick="selectTier('tier2')">
+          <div class="tier-header">
+            <span class="tier-name">Tier 2</span>
+            <span class="tier-price">$50,000<span>/yr</span></span>
+          </div>
+          <div class="tier-features">
+            • Custom security review<br>
+            • MSA review & AI addendum<br>
+            • 8 hours with Studio Team<br>
+            • Everything in Tier 1
+          </div>
+          <div class="tier-compute">825,000 compute units / month included</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sliders -->
+    <div class="card">
+      <!-- Team Size -->
+      <div class="slider-section">
+        <div class="slider-header">
+          <div>
+            <div class="label">Team Size</div>
+            <div class="sublabel" id="license-rate-label">$40/user/month</div>
+          </div>
+          <div style="text-align: right;">
+            <div class="slider-value"><span id="users-display">24</span><span> users</span></div>
+            <div class="sublabel" id="volume-hint">5% off at 50+ users</div>
+          </div>
+        </div>
+        <div style="position: relative; padding: 0 8px;">
+          <input type="range" id="users-slider" min="5" max="500" value="24" oninput="updateCalculations()" style="width: 100%;">
+          <div style="display: flex; justify-content: space-between; font-size: 12px; color: #999; margin-top: 8px;">
+            <span>5</span>
+            <span>125</span>
+            <span>250</span>
+            <span>375</span>
+            <span>500</span>
+          </div>
+        </div>
+        <div class="slider-footer">
+          <span style="color: #666;"></span>
+          <div style="text-align: right;">
+            <span id="license-annual">$11,520</span>/year
+            <div class="savings" id="license-savings" style="display: none;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Extra Compute -->
+      <div class="slider-section bordered">
+        <div class="slider-header">
+          <div>
+            <div class="label">Extra Compute</div>
+            <div class="sublabel">Additional compute at $0.001725/credit</div>
+          </div>
+          <div class="slider-value"><span id="compute-display">0</span><span> /mo</span></div>
+        </div>
+        <div class="slider-ticks">
+          <span>0</span>
+          <span>1M</span>
+          <span>2M</span>
+          <span>3M</span>
+        </div>
+        <input type="range" id="compute-slider" min="0" max="3000000" step="100000" value="0" oninput="updateCalculations()">
+        <div class="slider-footer">
+          <span style="color: #666;"><span id="total-credits">825,000</span> total compute units / month</span>
+          <div style="text-align: right;">
+            <span id="compute-annual">$0</span>/year
+            <div class="savings" id="compute-savings" style="display: none;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Multi-Year Commitment -->
+    <div class="card">
+      <div class="label" style="margin-bottom: 16px;">Contract Term</div>
+      <div style="display: flex; gap: 12px; margin-bottom: 20px;">
+        <div class="term-option active" id="term-1" onclick="selectTerm(1)">
+          <div class="term-years">1 Year</div>
+          <div class="term-discount">Standard pricing</div>
+        </div>
+        <div class="term-option" id="term-2" onclick="selectTerm(2)">
+          <div class="term-years">2 Years</div>
+          <div class="term-discount">5% off</div>
+        </div>
+        <div class="term-option" id="term-3" onclick="selectTerm(3)">
+          <div class="term-years">3 Years</div>
+          <div class="term-discount">10% off</div>
+        </div>
+      </div>
+
+      <div id="upfront-section" style="display: none; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+        <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+          <input type="checkbox" id="upfront-checkbox" onchange="updateCalculations()" style="width: 18px; height: 18px; cursor: pointer; accent-color: #16a34a;">
+          <div>
+            <div style="font-size: 14px;">Pay upfront for all years</div>
+            <div style="font-size: 12px; color: #666;">Additional 5% off total contract</div>
+          </div>
+          <div id="upfront-discount-badge" style="margin-left: auto; background: rgba(22,163,74,0.1); color: #16a34a; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 500;"></div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Summary -->
+    <div class="card">
+      <div class="label" style="margin-bottom: 16px;">Investment Summary</div>
+      <div class="summary-items">
+        <div class="summary-row">
+          <span id="platform-label">Platform Fee (Tier 1)</span>
+          <span id="platform-value">$25,000</span>
+        </div>
+        <div class="summary-row">
+          <span id="license-label">License Fees (24 users × $40/mo)</span>
+          <span id="license-value">$11,520</span>
+        </div>
+        <div class="summary-row">
+          <span id="compute-label">Extra Compute (0 credits/mo)</span>
+          <span id="compute-value">$0</span>
+        </div>
+      </div>
+      <div class="total-section">
+        <div>
+          <div class="label">Total Annual Investment</div>
+          <div class="sublabel" id="monthly-total">$3,043/month</div>
+        </div>
+        <div style="text-align: right;">
+          <div class="total-value" id="annual-total">$36,520</div>
+          <div class="total-savings" id="total-savings" style="display: none;"></div>
+        </div>
+      </div>
+      <button class="cta-button" onclick="window.open('mailto:sales@krea.ai?subject=Enterprise%20Pricing%20Inquiry', '_blank')">
+        Contact Sales
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M7 17L17 7M17 7H7M17 7V17" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Features -->
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-header">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+          <span class="feature-title">Organization</span>
+        </div>
+        <div class="feature-desc">Unlimited licenses, shared compute, team folders</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-header">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+          <span class="feature-title">Administration</span>
+        </div>
+        <div class="feature-desc">SSO, permissions, usage analytics</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-header">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+          <span class="feature-title">Services</span>
+        </div>
+        <div class="feature-desc">Priority support, SLAs, onboarding</div>
+      </div>
+    </div>
+
+    <div class="footer">
+      Trusted by Amazon Studios, Apple, Shopify, Nike, Pixar, Samsung, and more
+    </div>
+  </div>
+
+  <script>
+    let platformTier = 'tier1';
+    let contractYears = 1;
+
+    function selectTier(tier) {
+      platformTier = tier;
+      document.getElementById('tier1-card').classList.toggle('active', tier === 'tier1');
+      document.getElementById('tier2-card').classList.toggle('active', tier === 'tier2');
+      updateCalculations();
+    }
+
+    function selectTerm(years) {
+      contractYears = years;
+      document.getElementById('term-1').classList.toggle('active', years === 1);
+      document.getElementById('term-2').classList.toggle('active', years === 2);
+      document.getElementById('term-3').classList.toggle('active', years === 3);
+
+      // Show/hide upfront section
+      const upfrontSection = document.getElementById('upfront-section');
+      if (years > 1) {
+        upfrontSection.style.display = 'block';
+        const totalDiscount = years === 2 ? '10%' : '15%';
+        document.getElementById('upfront-discount-badge').textContent = 'Total: ' + totalDiscount + ' off';
+      } else {
+        upfrontSection.style.display = 'none';
+        document.getElementById('upfront-checkbox').checked = false;
+      }
+
+      updateCalculations();
+    }
+
+    function formatCurrency(amount) {
+      return '$' + Math.round(amount).toLocaleString('en-US');
+    }
+
+    function formatNumber(num) {
+      return num.toLocaleString('en-US');
+    }
+
+    function updateCalculations() {
+      const numUsers = parseInt(document.getElementById('users-slider').value);
+      const extraCredits = parseInt(document.getElementById('compute-slider').value);
+      const payUpfront = document.getElementById('upfront-checkbox').checked;
+
+      // Platform fee
+      const platformFee = platformTier === 'tier1' ? 25000 : 50000;
+
+      // Platform included compute units (both tiers)
+      const platformIncludedCredits = 825000;
+
+      // License pricing - Flat discount on ALL licenses at each tier
+      // Base: $40, 50+: 5% off, 100+: 10% off, 150+: 15% off, 200+: 20% off, 250+: 25% off, 300+: 30% off, 350+: 35% off
+      const baseLicenseRate = 40;
+      let discountPercent = 0;
+      if (numUsers >= 350) {
+        discountPercent = 35;
+      } else if (numUsers >= 300) {
+        discountPercent = 30;
+      } else if (numUsers >= 250) {
+        discountPercent = 25;
+      } else if (numUsers >= 200) {
+        discountPercent = 20;
+      } else if (numUsers >= 150) {
+        discountPercent = 15;
+      } else if (numUsers >= 100) {
+        discountPercent = 10;
+      } else if (numUsers >= 50) {
+        discountPercent = 5;
+      }
+
+      const licenseRate = baseLicenseRate * (1 - discountPercent / 100);
+      const monthlyLicenseCost = numUsers * licenseRate;
+      const annualLicenseCost = monthlyLicenseCost * 12;
+      const baseCost = numUsers * baseLicenseRate * 12;
+      const licenseSavings = baseCost - annualLicenseCost;
+
+      // Total credits: platform included + extra
+      const totalCredits = platformIncludedCredits + extraCredits;
+
+      // Compute costs at $0.001725/credit
+      const computeRate = 0.001725;
+      const extraComputeAnnual = extraCredits * computeRate * 12;
+
+      // Base annual total (before multi-year discounts)
+      const baseAnnualTotal = platformFee + annualLicenseCost + extraComputeAnnual;
+
+      // Multi-year discount
+      let multiYearDiscount = 0;
+      if (contractYears === 2) {
+        multiYearDiscount = payUpfront ? 0.10 : 0.05;
+      } else if (contractYears === 3) {
+        multiYearDiscount = payUpfront ? 0.15 : 0.10;
+      }
+
+      const discountedAnnualTotal = baseAnnualTotal * (1 - multiYearDiscount);
+      const totalContractValue = discountedAnnualTotal * contractYears;
+      const multiYearSavings = (baseAnnualTotal * contractYears) - totalContractValue;
+
+      // Total savings including volume + multi-year
+      const totalSavings = licenseSavings + (multiYearSavings / contractYears);
+
+      // Update UI
+      document.getElementById('users-display').textContent = numUsers;
+      document.getElementById('compute-display').textContent = formatNumber(extraCredits);
+      document.getElementById('total-credits').textContent = formatNumber(totalCredits);
+
+      // License rate label - show rate and discount
+      const rateLabel = document.getElementById('license-rate-label');
+      let rateText = '$' + licenseRate.toFixed(0) + '/user/month';
+      if (discountPercent > 0) {
+        rateText += '<span class="volume-active">' + discountPercent + '% volume discount</span>';
+      }
+      rateLabel.innerHTML = rateText;
+
+      // Volume hint - show next tier info
+      const volumeHint = document.getElementById('volume-hint');
+      if (numUsers < 50) {
+        volumeHint.textContent = '5% off at 50+ users';
+        volumeHint.style.color = '#999';
+      } else if (numUsers < 100) {
+        volumeHint.textContent = '10% off at 100+ users';
+        volumeHint.style.color = '#999';
+      } else if (numUsers < 150) {
+        volumeHint.textContent = '15% off at 150+ users';
+        volumeHint.style.color = '#999';
+      } else if (numUsers < 200) {
+        volumeHint.textContent = '20% off at 200+ users';
+        volumeHint.style.color = '#999';
+      } else if (numUsers < 250) {
+        volumeHint.textContent = '25% off at 250+ users';
+        volumeHint.style.color = '#999';
+      } else if (numUsers < 300) {
+        volumeHint.textContent = '30% off at 300+ users';
+        volumeHint.style.color = '#999';
+      } else if (numUsers < 350) {
+        volumeHint.textContent = '35% off at 350+ users';
+        volumeHint.style.color = '#999';
+      } else {
+        volumeHint.textContent = 'Maximum discount (35%)';
+        volumeHint.style.color = '#16a34a';
+      }
+
+      // License values
+      document.getElementById('license-annual').textContent = formatCurrency(annualLicenseCost);
+      const licenseSavingsEl = document.getElementById('license-savings');
+      if (licenseSavings > 0) {
+        licenseSavingsEl.textContent = 'Saving ' + formatCurrency(licenseSavings) + '/year';
+        licenseSavingsEl.style.display = 'block';
+      } else {
+        licenseSavingsEl.style.display = 'none';
+      }
+
+      // Compute values
+      document.getElementById('compute-annual').textContent = formatCurrency(extraComputeAnnual);
+      const computeSavingsEl = document.getElementById('compute-savings');
+      computeSavingsEl.style.display = 'none';
+
+      // Summary
+      document.getElementById('platform-label').textContent = 'Platform Fee (' + (platformTier === 'tier1' ? 'Tier 1' : 'Tier 2') + ')';
+      document.getElementById('platform-value').textContent = formatCurrency(platformFee);
+      document.getElementById('license-label').textContent = 'License Fees (' + numUsers + ' users \u00d7 $' + licenseRate.toFixed(0) + '/mo)';
+      document.getElementById('license-value').textContent = formatCurrency(annualLicenseCost);
+      document.getElementById('compute-label').textContent = 'Extra Compute (' + formatNumber(extraCredits) + ' credits/mo)';
+      document.getElementById('compute-value').textContent = formatCurrency(extraComputeAnnual);
+
+      // Totals - show contract total if multi-year
+      if (contractYears > 1) {
+        const discountLabel = (multiYearDiscount * 100) + '% multi-year discount';
+        document.getElementById('monthly-total').textContent = formatCurrency(discountedAnnualTotal / 12) + '/month \u2022 ' + discountLabel;
+        document.getElementById('annual-total').textContent = formatCurrency(totalContractValue);
+        document.getElementById('annual-total').insertAdjacentHTML('afterend',
+          '<div id="contract-term-label" style="font-size: 14px; color: #666; margin-top: 4px;">' + contractYears + '-year contract total</div>');
+        // Remove duplicate labels
+        const existingLabels = document.querySelectorAll('#contract-term-label');
+        if (existingLabels.length > 1) {
+          for (let i = 0; i < existingLabels.length - 1; i++) {
+            existingLabels[i].remove();
+          }
+        }
+      } else {
+        document.getElementById('monthly-total').textContent = formatCurrency(baseAnnualTotal / 12) + '/month';
+        document.getElementById('annual-total').textContent = formatCurrency(baseAnnualTotal);
+        const existingLabel = document.getElementById('contract-term-label');
+        if (existingLabel) existingLabel.remove();
+      }
+
+      const totalSavingsEl = document.getElementById('total-savings');
+      if (totalSavings > 0) {
+        let savingsText = 'Total savings: ' + formatCurrency(totalSavings) + '/year';
+        if (multiYearSavings > 0) {
+          savingsText += ' (incl. ' + formatCurrency(multiYearSavings / contractYears) + ' multi-year)';
+        }
+        totalSavingsEl.textContent = savingsText;
+        totalSavingsEl.style.display = 'block';
+      } else {
+        totalSavingsEl.style.display = 'none';
+      }
+    }
+
+    // Initialize
+    updateCalculations();
+  </script>
+</body>
+</html>
